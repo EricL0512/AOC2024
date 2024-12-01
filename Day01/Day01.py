@@ -8,7 +8,39 @@ def get_file_data(file_name) -> list[str]:
         data.append(line.rstrip())
     return data
 
-def part_one() -> None:
-  
+
+def part_one():
+    result = 0
+    left = []
+    right = []
+    for i in file_data:
+        left.append(int(i.split(" ")[0]))
+        right.append(int(i.split(" ")[-1]))
+        left.sort()
+        right.sort()
+    for index in range(len(left)):
+        result += abs(left[index] - right[index])
+    print(result)
+
+
+
+
+def part_two():
+    result = 0
+    left = []
+    right = []
+    for i in file_data:
+        left.append(int(i.split(" ")[0]))
+        right.append(int(i.split(" ")[-1]))
+    for i in left:
+        count = 0
+        for j in right:
+            if i == j:
+                count += 1
+        result += i * count
+    print(result)
+
 
 file_data = get_file_data("input")
+part_one()
+part_two()
