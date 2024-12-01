@@ -20,7 +20,7 @@ def part_one():
         right.sort()
     for index in range(len(left)):
         result += abs(left[index] - right[index])
-    print(result)
+    print(f"part one: {result}")
 
 
 
@@ -38,7 +38,7 @@ def part_two():
             if i == j:
                 count += 1
         result += i * count
-    print(result)
+    print(f"part two: {result}")
 
 
 file_data = get_file_data("input")
