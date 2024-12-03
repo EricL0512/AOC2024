@@ -25,6 +25,7 @@ def part_one():
                         total += int(first) * int(second)
     print(f"part two: {total}")
 
+
 def part_two():
     all_lines = ""
     total = 0
@@ -43,7 +44,6 @@ def part_two():
                 if first.isnumeric() and second.isnumeric():
                     total += int(first) * int(second)
     print(f"part one: {total}")
-
 
 
 file_data = get_file_data("input")
