@@ -84,7 +84,8 @@ def part_two():
     this will be your guidance list/dict/map that will dictate how the rest of the lists are formed
 
     connect the pattern terms with the guidance list/dict/map 
-    O(n)? 
+    
+    DOESNT WORK: RETRY
     """
 
     for line in wrong_patterns:
@@ -104,6 +105,7 @@ def part_two():
                 pattern_found = True
             if pattern_found:
                 break
+
 
 def redo_two():
     rule_list = []
@@ -127,12 +129,12 @@ def redo_two():
         ahead_list.append(rule.split("|")[0])
         behind_list.append(rule.split("|")[1])
     rule_list_nocopy = list(set(ahead_list + behind_list))
-    for number in rule_list:
+    for number in rule_list_nocopy:
         rules_dict[number] = 0
     for behind in behind_list:
         if behind in rules_dict:
             rules_dict[behind] += 1
-
+            print(rules_dict)
     # find wrong patterns
     for pattern in pattern_list:
         correct_pattern = True
@@ -146,11 +148,18 @@ def redo_two():
                 correct_pattern = False
         if not correct_pattern:
             wrong_patterns.append(pattern)
-    correct_patterns = ['']*50  # I believe its 48 or 49 total values but will put 50 to be safe
     for line in wrong_patterns:
+        correct_patterns = [''] * 50  # I believe its 49 total values but will put 50 to be safe
         for number in line:
+            print(number)
+            print(rules_dict[number])
             correct_patterns[rules_dict[number]] = number
-        
+            print(correct_patterns)
+        temp_list = [i for i in correct_patterns if i != '']
+        correct_patterns = temp_list
+        print(correct_patterns)
+        total += int(correct_patterns[len(correct_patterns) // 2])
+    print(rules_dict)
 
 
 file_data = get_file_data("input")
