@@ -25,6 +25,7 @@ def part_one():
             if char == "^":
                 pos = [r, c]
                 found_start = True
+    pos_start = list(pos)
     count = 1  # First position already covered
     past_pos = [[pos[0], pos[1]]]  # Just in case the guard passes the same points, first position already covered
     while True:
@@ -66,13 +67,14 @@ def part_one():
         except IndexError:
             break
     print(f"part one: {count}")
-    return past_pos, pos
+    return past_pos, pos_start
 
 
 # Brute force probably because not time limited
 # Will pass past_pos from part_one into part_two for simplicity
 # ~ symbol will be used to represent path
 def part_two(past_pos, pos):
+    print(pos)
     two_di = []
     two_di += (list(i) for i in file_data)
     for pair in past_pos:
@@ -88,44 +90,48 @@ def part_two(past_pos, pos):
             if char != "~" or char == "^":
                 continue
             two_di[r][c] = "#"
-            pos = start_pos
-            print(pos)
+            pos = list(start_pos)
             hash_touched = []
             while True:
                 try:
-                    print(pos[0], pos[1])
+                    print(hash_touched)
                     if not (pos[0] > 0 and pos[1] > 0):
-                        break
-                    if [pos[0], pos[1]] in hash_touched:
-                        count += 1
                         break
                     if curr_direction == "^":
                         if two_di[pos[0] - 1][pos[1]] != "#":
                             pos[0] -= 1
                         else:
-                            print(1)
-                            hash_touched += [pos[0], pos[1]]
+                            if [pos[0], pos[1]] in hash_touched:
+                                count += 1
+                                break
+                            hash_touched.append([pos[0], pos[1]])
                             curr_direction = directions[curr_direction]
                     elif curr_direction == ">":
                         if two_di[pos[0]][pos[1] + 1] != "#":
                             pos[1] += 1
                         else:
-                            print(4)
-                            hash_touched += [pos[0], pos[1]]
+                            if [pos[0], pos[1]] in hash_touched:
+                                count += 1
+                                break
+                            hash_touched.append([pos[0], pos[1]])
                             curr_direction = directions[curr_direction]
                     elif curr_direction == "v":
                         if two_di[pos[0] + 1][pos[1]] != "#":
                             pos[0] += 1
                         else:
-                            print(2)
-                            hash_touched += [pos[0], pos[1]]
+                            if [pos[0], pos[1]] in hash_touched:
+                                count += 1
+                                break
+                            hash_touched.append([pos[0], pos[1]])
                             curr_direction = directions[curr_direction]
                     elif curr_direction == "<":
                         if two_di[pos[0]][pos[1] - 1] != "#":
                             pos[1] -= 1
                         else:
-                            print(3)
-                            hash_touched += [pos[0], pos[1]]
+                            if [pos[0], pos[1]] in hash_touched:
+                                count += 1
+                                break
+                            hash_touched.append([pos[0], pos[1]])
                             curr_direction = directions[curr_direction]
                 except IndexError:
                     break
