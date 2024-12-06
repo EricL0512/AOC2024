@@ -1,4 +1,3 @@
-import itertools
 from typing import TextIO
 
 
@@ -10,157 +9,133 @@ def get_file_data(file_name) -> list[str]:
     return data
 
 
-# Find ones already in right order
-
 def part_one():
-    rule_list = []
-    pattern_list = []
-    pattern_start = False
-    total = 0
-    # Separate the inputs
-    for line in file_data:
-        if line != "" and not pattern_start:
-            rule_list.append(line)
-        elif not pattern_start:
-            pattern_start = True
-        else:
-            pattern_list.append(line)
-    print(rule_list)
-    for pattern in pattern_list:
-        correct_pattern = True
-        pattern = pattern.split(',')
-        for rule in rule_list:
-            ahead = rule.split("|")[0]
-            behind = rule.split("|")[1]
-            if not (ahead in pattern and behind in pattern):
-                continue
-            if pattern.index(behind) < pattern.index(ahead):
-                correct_pattern = False
-        if correct_pattern:
-            total += int(pattern[len(pattern) // 2])
-    print(total)
-
-
-# PART TWO REQUIRES SOME GREEDY ALGORITHM OR INSIGHT
-# INSIGHT FOUND!
-def part_two():
-    rule_list = []
-    pattern_list = []
-    wrong_patterns = []
-    pattern_start = False
-    total = 0
-    # Separate the inputs
-    for line in file_data:
-        if line != "" and not pattern_start:
-            rule_list.append(line)
-        elif not pattern_start:
-            pattern_start = True
-        else:
-            pattern_list.append(line)
-    for pattern in pattern_list:
-        correct_pattern = True
-        pattern = pattern.split(',')
-        for rule in rule_list:
-            ahead = rule.split("|")[0]
-            behind = rule.split("|")[1]
-            if not (ahead in pattern and behind in pattern):
-                continue
-            if pattern.index(behind) < pattern.index(ahead):
-                correct_pattern = False
-        if not correct_pattern:
-            wrong_patterns.append(pattern)
-
-    # Brute force using two for loops
-    # Yea that's not happening. 2^17 is too much permutations
-    """IDEA: Make a list/dict/map based on the rules given? compare the pattern to the 
-    list/dict/map and if its in ascending order then its correct? 
-
-    To do this, find the front-most number based on the right side of the rule: FRONT MOST
-    SHOULD NEVER BE ON THE RIGHT SIDE OF THE RULE AS ITS THE FIRST ELEMENT
-
-    NVM this is alot easier than it looks:
-    Find all possible values from both sides combined: use a set
-    order values by how their mode/frequency of appearance on the right side of the rule
-    this will be your guidance list/dict/map that will dictate how the rest of the lists are formed
-
-    connect the pattern terms with the guidance list/dict/map 
-    
-    DOESNT WORK: RETRY
-    """
-
-    for line in wrong_patterns:
-        pattern_found = False
-        permutations = list(itertools.permutations(line))
-        for line_two in permutations:
-            correct_pattern = True
-            for rule in rule_list:
-                ahead = rule.split("|")[0]
-                behind = rule.split("|")[1]
-                if not (ahead in line_two and behind in line_two):
-                    continue
-                if line_two.index(behind) < line_two.index(ahead):
-                    correct_pattern = False
-            if correct_pattern:
-                total += int(line_two[len(line_two) // 2])
-                pattern_found = True
-            if pattern_found:
+    pos = [0, 0]
+    directions = {"^": ">", ">": "v", "v": "<", "<": "^"}
+    two_di = []
+    two_di += (list(i) for i in file_data)
+    curr_direction = "^"
+    found_start = False
+    for r, row in enumerate(two_di):
+        if found_start:
+            break
+        for c, char in enumerate(row):
+            if found_start:
                 break
+            if char == "^":
+                pos = [r, c]
+                found_start = True
+    pos_start = list(pos)
+    count = 1  # First position already covered
+    past_pos = [[pos[0], pos[1]]]  # Just in case the guard passes the same points, first position already covered
+    while True:
+        try:
+            if not (pos[0] > 0 and pos[1] > 0):
+                break
+            if curr_direction == "^":
+                if two_di[pos[0] - 1][pos[1]] != "#":
+                    pos[0] -= 1
+                    if not [pos[0], pos[1]] in past_pos:
+                        count += 1
+                    past_pos.append([pos[0], pos[1]])
+                else:
+                    curr_direction = directions[curr_direction]
+            elif curr_direction == ">":
+                if two_di[pos[0]][pos[1] + 1] != "#":
+                    pos[1] += 1
+                    if not [pos[0], pos[1]] in past_pos:
+                        count += 1
+                    past_pos.append([pos[0], pos[1]])
+                else:
+                    curr_direction = directions[curr_direction]
+            elif curr_direction == "v":
+                if two_di[pos[0]+1][pos[1]] != "#":
+                    pos[0] += 1
+                    if not [pos[0], pos[1]] in past_pos:
+                        count += 1
+                    past_pos.append([pos[0], pos[1]])
+                else:
+                    curr_direction = directions[curr_direction]
+            elif curr_direction == "<":
+                if two_di[pos[0]][pos[1] - 1] != "#":
+                    pos[1] -= 1
+                    if not [pos[0], pos[1]] in past_pos:
+                        count += 1
+                    past_pos.append([pos[0], pos[1]])
+                else:
+                    curr_direction = directions[curr_direction]
+        except IndexError:
+            break
+    print(f"part one: {count}")
+    return past_pos, pos_start
 
 
-def redo_two():
-    rule_list = []
-    pattern_list = []
-    ahead_list = []
-    behind_list = []
-    wrong_patterns = []
-    rules_dict: dict = {}
-    pattern_start = False
-    total = 0
-    # Separate the inputs
-    for line in file_data:
-        if line != "" and not pattern_start:
-            rule_list.append(line)
-        elif not pattern_start:
-            pattern_start = True
-        else:
-            pattern_list.append(line)
-    # create the rules list, make the rules dict
-    for rule in rule_list:
-        ahead_list.append(rule.split("|")[0])
-        behind_list.append(rule.split("|")[1])
-    rule_list_nocopy = list(set(ahead_list + behind_list))
-    for number in rule_list_nocopy:
-        rules_dict[number] = 0
-    for behind in behind_list:
-        if behind in rules_dict:
-            rules_dict[behind] += 1
-            print(rules_dict)
-    # find wrong patterns
-    for pattern in pattern_list:
-        correct_pattern = True
-        pattern = pattern.split(',')
-        for rule in rule_list:
-            ahead = rule.split("|")[0]
-            behind = rule.split("|")[1]
-            if not (ahead in pattern and behind in pattern):
+# Brute force probably because not time limited
+# Will pass past_pos from part_one into part_two for simplicity
+# ~ symbol will be used to represent path
+def part_two(past_pos, pos):
+    print(pos)
+    two_di = []
+    two_di += (list(i) for i in file_data)
+    for pair in past_pos:
+        two_di[pair[0]][pair[1]] = "~"
+
+    # Make a list to keep track of times you hit a #
+    count = 0
+    directions = {"^": ">", ">": "v", "v": "<", "<": "^"}
+    curr_direction = "^"
+    start_pos = list(pos)
+    for r, row in enumerate(two_di):
+        for c, char in enumerate(row):
+            if char != "~" or char == "^":
                 continue
-            if pattern.index(behind) < pattern.index(ahead):
-                correct_pattern = False
-        if not correct_pattern:
-            wrong_patterns.append(pattern)
-    for line in wrong_patterns:
-        correct_patterns = [''] * 50  # I believe its 49 total values but will put 50 to be safe
-        for number in line:
-            print(number)
-            print(rules_dict[number])
-            correct_patterns[rules_dict[number]] = number
-            print(correct_patterns)
-        temp_list = [i for i in correct_patterns if i != '']
-        correct_patterns = temp_list
-        print(correct_patterns)
-        total += int(correct_patterns[len(correct_patterns) // 2])
-    print(rules_dict)
+            two_di[r][c] = "#"
+            pos = list(start_pos)
+            hash_touched = 0
+            curr_direction = "^"
+            while True:
+                try:
+                    hash_touched += 1
+                    if not (pos[0] > 0 and pos[1] > 0):
+                        break
+                    if curr_direction == "^":
+                        if two_di[pos[0] - 1][pos[1]] != "#":
+                            pos[0] -= 1
+                        else:
+                            if hash_touched >= 10000:
+                                count += 1
+                                break
+                            curr_direction = directions[curr_direction]
+                    elif curr_direction == ">":
+                        if two_di[pos[0]][pos[1] + 1] != "#":
+                            pos[1] += 1
+                        else:
+                            if hash_touched >= 10000:
+                                count += 1
+                                break
+                            curr_direction = directions[curr_direction]
+                    elif curr_direction == "v":
+                        if two_di[pos[0] + 1][pos[1]] != "#":
+                            pos[0] += 1
+                        else:
+                            if hash_touched >= 10000:
+                                count += 1
+                                break
+                            curr_direction = directions[curr_direction]
+                    elif curr_direction == "<":
+                        if two_di[pos[0]][pos[1] - 1] != "#":
+                            pos[1] -= 1
+                        else:
+                            if hash_touched >= 10000:
+                                count += 1
+                                break
+                            curr_direction = directions[curr_direction]
+                except IndexError:
+                    break
+            two_di[r][c] = "~"
+    print(count)
 
 
 file_data = get_file_data("input")
-redo_two()
+past_pos, pos = part_one()
+part_two(past_pos, pos)
