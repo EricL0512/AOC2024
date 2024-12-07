@@ -16,13 +16,9 @@ def part_one():
     for i in file_data:
         left.append(int(i.split(" ")[0]))
         right.append(int(i.split(" ")[-1]))
-        left.sort()
-        right.sort()
-    for index in range(len(left)):
-        result += abs(left[index] - right[index])
+    for index, i in enumerate(sorted(left)):
+        result += abs(sorted(left)[index] - sorted(right)[index])
     print(f"part one: {result}")
-
-
 
 
 def part_two():
@@ -33,11 +29,7 @@ def part_two():
         left.append(int(i.split(" ")[0]))
         right.append(int(i.split(" ")[-1]))
     for i in left:
-        count = 0
-        for j in right:
-            if i == j:
-                count += 1
-        result += i * count
+        result += i * right.count(i)
     print(f"part two: {result}")
 
 
