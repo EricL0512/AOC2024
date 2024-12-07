@@ -14,13 +14,23 @@ def part_one():
     count = 0
     for line in file_data:
         target = int(line.split(":")[0])
-        equation = line.split(":")[1][1:]
-        equation = equation.split(" ")
+        # gets the second half of the line (the equation) and turns it into a list
+        equation = line.split(": ")[1].split(" ")
+        """
+        short version: binary tree
+        
+        All the possible combinations of operations for an equation (NOTE: that there is one less operation than term)
+        Ex: 1 + 2 has two terms but only one operation operations = terms-1
+        """
         operator_perm = list(itertools.product("*+", repeat=len(equation) - 1))
-        equation2 = list(int(i) for i in equation)
-        equation = equation2
+        # Converts each equation element into a integer
+        equation = list(int(i) for i in equation)
         for operation in operator_perm:
             tmp = equation[0]
+            """
+            Modified version of partial sums. Instead of tmp being the sum of each of the previous elements, tmp can be 
+            multiplicative or additive? (as in combining the digits of two numbers)
+            """
             for n, num in enumerate(equation[:-1]):
                 if operation[n] == "*":
                     tmp = (tmp * equation[n + 1])
@@ -36,13 +46,23 @@ def part_two():
     count = 0
     for line in file_data:
         target = int(line.split(":")[0])
-        equation = line.split(":")[1][1:]
-        equation = equation.split(" ")
+        # gets the second half of the line (the equation) and turns it into a list
+        equation = line.split(": ")[1].split(" ")
+        """
+        short version: binary tree
+        
+        All the possible combinations of operations for an equation (NOTE: that there is one less operation than term)
+        Ex: 1 + 2 has two terms but only one operation operations = terms-1
+        """
         operator_perm = list(itertools.product("*+|", repeat=len(equation) - 1))
-        equation2 = list(int(i) for i in equation)
-        equation = equation2
+        # Converts each equation element into a integer
+        equation = list(int(i) for i in equation)
         for operation in operator_perm:
             tmp = equation[0]
+            """
+            Modified version of partial sums. Instead of tmp being the sum of each of the previous elements, tmp can be 
+            multiplicative or additive? (as in combining the digits of two numbers)
+            """
             for n, num in enumerate(equation[:-1]):
                 if operation[n] == "*":
                     tmp = (tmp * equation[n + 1])
@@ -59,3 +79,16 @@ def part_two():
 file_data = get_file_data("input")
 part_one()
 part_two()
+
+r"""
+Binary Tree Visualization (only + and *, 2 terms total)
+
+                        None 
+                       /    \ 
+                     +        *                                                 
+                    / \      / \  
+                   /   \    /   \ 
+                  ++   +*  *+    +*                   
+        
+result: (++, +*, *+, +*)                                                                                                        
+"""
