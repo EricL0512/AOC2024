@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-
 using namespace std;
 
 int main() {
@@ -29,19 +28,13 @@ int main() {
     }
     sort(left.begin(), left.end());
     sort(right.begin(), right.end());
-    for (int i = 0; i < left.size(); i++) {
-        total += abs(left.at(i) - right.at(i));
-    }
+    for (int i = 0; i < left.size(); i++) total += abs(left.at(i) - right.at(i));
     cout << "part one: " << total << endl;
     // whether vector is sorted or not doesn't matter; just use sorted vector
     total = 0;
     // nested for loop. takes an element from left, checks repeats on right, multiply repeat and left element and add to total
     for (int i : left) {
-        int repeats = 0;
-        for (int j : right) {
-            if (i == j) repeats++;
-        }
-        total += (i * repeats);
+        total += i * count(right.begin(), right.end(), i);
     }
     cout << "part two: " << total;
     file.close();
